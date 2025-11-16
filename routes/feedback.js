@@ -27,10 +27,10 @@ const feedbackValidation = Joi.object({
 
 // Rate limiting for feedback submission
 const feedbackLimiter = require('express-rate-limit')({
-  windowMs: 10 * 60 * 1000, // 10 minutes
-  max: 3, // limit each IP to 3 feedback submissions per 10 minutes
+  windowMs: 30 * 1000, // 30 seconds
+  max: 1, // limit each IP to 1 feedback submission per 30 seconds
   message: {
-    error: 'Too many feedback submissions. Please wait 10 minutes before submitting again.',
+    error: 'Please wait 30 seconds before submitting another feedback.',
   },
   standardHeaders: true,
   legacyHeaders: false,
