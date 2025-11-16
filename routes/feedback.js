@@ -14,8 +14,7 @@ const feedbackValidation = Joi.object({
     'string.empty': 'Email is required',
     'string.email': 'Please provide a valid email address'
   }),
-  contactNumber: Joi.string().min(10).max(20).required().messages({
-    'string.empty': 'Contact number is required',
+  contactNumber: Joi.string().min(10).max(20).optional().allow('').messages({
     'string.min': 'Contact number must be at least 10 digits',
     'string.max': 'Contact number cannot exceed 20 characters'
   }),
