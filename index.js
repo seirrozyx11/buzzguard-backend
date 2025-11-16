@@ -41,7 +41,7 @@ const corsOptions = {
     'https://buzzguard-website.netlify.app',
     'https://buzzguard.netlify.app',
     'https://seirrozyx11.github.io',
-    'https://buzzguard.vercel.app',
+    'https://buzzguard.onrender.com',
     'https://buzzguard-website.onrender.com',
     'https://buzzguard-frontend.onrender.com',
         process.env.FRONTEND_URL
