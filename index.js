@@ -35,9 +35,14 @@ const corsOptions = {
   origin: [
     'http://localhost:3000',
     'http://localhost:5000',
+    'http://localhost:8080',
     'http://127.0.0.1:5500',
+    'http://127.0.0.1:8080',
     'https://buzzguard-website.netlify.app',
     'https://buzzguard.netlify.app',
+    'https://seirrozyx11.github.io',
+    'https://buzzguard.vercel.app',
+    'https://buzzguard-backend.onrender.com',
     process.env.FRONTEND_URL
   ].filter(Boolean),
   credentials: true,
