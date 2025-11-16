@@ -42,9 +42,10 @@ const corsOptions = {
     'https://buzzguard.netlify.app',
     'https://seirrozyx11.github.io',
     'https://buzzguard.vercel.app',
-    'https://buzzguard-backend.onrender.com',
-    process.env.FRONTEND_URL
-  ].filter(Boolean),
+    'https://buzzguard-website.onrender.com',
+    'https://buzzguard-frontend.onrender.com',
+        process.env.FRONTEND_URL
+    ].filter(Boolean),
   credentials: true,
   optionsSuccessStatus: 200,
 };
