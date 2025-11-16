@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: buzzguard-feedback-api
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        fromDatabase:
+          name: buzzguard-mongodb
+          property: connectionString
+      - key: ADMIN_KEY
+        generateValue: true
+      - key: FRONTEND_URL
+        value: https://your-website-domain.com
+
+databases:
+  - name: buzzguard-mongodb
+    plan: free
