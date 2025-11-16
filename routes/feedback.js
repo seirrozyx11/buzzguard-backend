@@ -26,14 +26,19 @@ const feedbackValidation = Joi.object({
 });
 
 // Rate limiting for feedback submission
+// Allows multiple users from same network (office/school) to submit
 const feedbackLimiter = require('express-rate-limit')({
-  windowMs: 30 * 1000, // 30 seconds
-  max: 1, // limit each IP to 1 feedback submission per 30 seconds
+  windowMs: 60 * 1000, // 1 minute
+  max: 5, // limit each IP to 5 feedback submissions per minute
   message: {
-    error: 'Please wait 30 seconds before submitting another feedback.',
+    error: 'Too many submissions from this network. Please wait a moment before trying again.',
   },
   standardHeaders: true,
   legacyHeaders: false,
+  // Skip successful requests from counting (only count failed attempts)
+  skipSuccessfulRequests: false,
+  // Skip failed requests to not penalize validation errors
+  skipFailedRequests: true,
 });
 
 // @route   POST /api/feedback
