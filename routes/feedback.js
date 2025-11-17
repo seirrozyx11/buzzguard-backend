@@ -22,6 +22,10 @@ const feedbackValidation = Joi.object({
     'string.empty': 'Message is required',
     'string.min': 'Message must be at least 10 characters long',
     'string.max': 'Message cannot exceed 1000 characters'
+  }),
+  rating: Joi.number().min(1).max(5).optional().default(5).messages({
+    'number.min': 'Rating must be at least 1',
+    'number.max': 'Rating cannot exceed 5'
   })
 });
 
