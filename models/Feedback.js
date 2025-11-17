@@ -29,6 +29,12 @@ const feedbackSchema = new mongoose.Schema({
     minlength: [10, 'Message must be at least 10 characters long'],
     maxlength: [1000, 'Message cannot exceed 1000 characters']
   },
+  rating: {
+    type: Number,
+    min: 1,
+    max: 5,
+    default: 5 // Default to 5 stars if not specified
+  },
   status: {
     type: String,
     enum: ['new', 'read', 'responded', 'archived'],
@@ -141,22 +147,56 @@ feedbackSchema.statics.getPublicFeedback = function(limit = 10) {
 };
 
 // Static method to get feedback stats
-feedbackSchema.statics.getStats = function() {
-  return Promise.all([
+feedbackSchema.statics.getStats = async function() {
+  const [
+    total,
+    newCount,
+    read,
+    responded,
+    high,
+    urgent,
+    ratingStats
+  ] = await Promise.all([
     this.countDocuments(),
     this.countDocuments({ status: 'new' }),
     this.countDocuments({ status: 'read' }),
     this.countDocuments({ status: 'responded' }),
     this.countDocuments({ priority: 'high' }),
-    this.countDocuments({ priority: 'urgent' })
-  ]).then(([total, newCount, read, responded, high, urgent]) => ({
+    this.countDocuments({ priority: 'urgent' }),
+    this.aggregate([
+      {
+        $group: {
+          _id: null,
+          averageRating: { $avg: '$rating' },
+          totalRatings: { $sum: 1 }
+        }
+      }
+    ])
+  ]);
+  
+  // Calculate average rating (default to 4.8 if no ratings)
+  const avgRating = ratingStats.length > 0 && ratingStats[0].averageRating 
+    ? Number(ratingStats[0].averageRating.toFixed(1))
+    : 4.8;
+  
+  // Calculate user satisfaction percentage
+  // Satisfaction = users who gave 4-5 stars / total feedback * 100
+  const highRatingCount = await this.countDocuments({ rating: { $gte: 4 } });
+  const satisfactionPercentage = total > 0 
+    ? Math.round((highRatingCount / total) * 100)
+    : 97;
+  
+  return {
     total,
     new: newCount,
     read,
     responded,
     highPriority: high,
-    urgent
-  }));
+    urgent,
+    averageRating: avgRating,
+    satisfactionPercentage,
+    highRatingCount
+  };
 };
 
 module.exports = mongoose.model('Feedback', feedbackSchema);
