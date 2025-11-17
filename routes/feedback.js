@@ -223,6 +223,69 @@ router.get('/stats', async (req, res) => {
   }
 });
 
+// @route   POST /api/feedback/migrate-ratings
+// @desc    Migration endpoint to add ratings to existing feedback
+// @access  Admin only (one-time use)
+router.post('/migrate-ratings', async (req, res) => {
+  try {
+    const { adminKey } = req.headers;
+    
+    // Simple admin key check
+    if (adminKey !== process.env.ADMIN_KEY) {
+      return res.status(401).json({
+        success: false,
+        error: 'Unauthorized',
+        message: 'Admin access required'
+      });
+    }
+    
+    // Find all feedback without rating field
+    const feedbackWithoutRating = await Feedback.countDocuments({ 
+      rating: { $exists: false } 
+    });
+    
+    if (feedbackWithoutRating > 0) {
+      // Update all feedback without rating to have default rating of 5
+      const result = await Feedback.updateMany(
+        { rating: { $exists: false } },
+        { $set: { rating: 5 } }
+      );
+      
+      // Get updated stats
+      const stats = await Feedback.getStats();
+      
+      res.json({
+        success: true,
+        message: `Successfully updated ${result.modifiedCount} feedback entries with default rating`,
+        data: {
+          updated: result.modifiedCount,
+          stats
+        }
+      });
+    } else {
+      // Get current stats
+      const stats = await Feedback.getStats();
+      
+      res.json({
+        success: true,
+        message: 'All feedback already has ratings',
+        data: {
+          updated: 0,
+          stats
+        }
+      });
+    }
+    
+  } catch (error) {
+    console.error('Error migrating ratings:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Server Error',
+      message: 'Failed to migrate ratings'
+    });
+  }
+});
+
 // @route   GET /api/feedback/:id
 // @desc    Get specific feedback by ID
 // @access  Public (limited) / Admin (full)
